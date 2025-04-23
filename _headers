@@ -1,0 +1,12 @@
+# Cache static assets for 1 month
+/assets/*
+  Cache-Control: public, max-age=2592000
+
+/assets/ethereal-hum.mp3
+  Cache-Control: public, max-age=2592000
+
+# Cache CSS and JS for 1 week
+/styles.css
+  Cache-Control: public, max-age=3600
+/script.js
+  Cache-Control: public, max-age=3600

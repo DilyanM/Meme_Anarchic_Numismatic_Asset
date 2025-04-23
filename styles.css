@@ -1,0 +1,1109 @@
+/* Base Styles */
+:root {
+    --primary-color: #00ff9d;
+    --secondary-color: #9d00ff;
+    --terminal-green: #00ff9d;
+    --background-dark: #0a0a10;
+    --text-light: #f0f0f0;
+    --terminal-bg: rgba(0, 0, 0, 0.85);
+    --terminal-border: #444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    overflow: hidden;
+    font-size: 1.1rem;
+}
+
+/* Intro Section */
+#intro-section {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--background-dark);
+    z-index: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.intro-image {
+    width: 1280px;
+    height: 768px;
+    object-fit: contain;
+    max-width: 90vw;
+    max-height: 80vh;
+    z-index: 1;
+}
+
+#explore-button {
+    margin-top: 20px;
+    background-color: var(--terminal-bg);
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 12px 24px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 1;
+    position: relative;
+}
+
+#explore-button:hover {
+    background-color: var(--primary-color);
+    color: var(--background-dark);
+}
+
+#transition-video {
+    width: 1280px;
+    height: 768px;
+    max-width: 90vw;
+    max-height: 80vh;
+    object-fit: contain;
+    z-index: 1000;
+    background-color: var(--background-dark);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+#transition-video:not(.hidden) {
+    display: block;
+}
+
+/* Hide intro image when transition video is active */
+.intro-image {
+    display: block;
+}
+#transition-video:not(.hidden) ~ .intro-image {
+    display: none !important;
+}
+
+/* Main Website */
+#main-website {
+    display: none;
+    position: relative;
+    min-height: 100vh;
+    z-index: 2;
+}
+
+/* Background Images */
+.background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('assets/library-background.jpg') no-repeat center left fixed;
+    background-size: cover;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+/* Background Video */
+#background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    min-width: 100vw;
+    min-height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    pointer-events: none;
+    transition: opacity 1s ease; /* Smooth transition for video switching */
+}
+
+/* Static Image for Transition */
+#static-image-transition {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* When main website is shown */
+body.main-active {
+    overflow: auto;
+}
+
+body.main-active #intro-section {
+    display: none;
+}
+
+body.main-active #main-website {
+    display: block;
+}
+
+body.main-active .background-image,
+body.main-active .background-image-right {
+    display: block;
+}
+
+/* Ensure background images are hidden during intro and transition */
+#intro-section:not(.hidden) ~ #main-website .background-image-left,
+#intro-section:not(.hidden) ~ #main-website .background-image-right,
+#transition-video:not(.hidden) ~ #main-website .background-image-left,
+#transition-video:not(.hidden) ~ #main-website .background-image-right {
+    display: none !important;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--primary-color);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: rgba(10, 10, 16, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 1000;
+}
+
+/* Logo */
+.logo {
+    margin-left: 20px;
+}
+
+.logo h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--primary-color);
+    font-size: 2.8rem;
+}
+
+.logo p {
+    font-size: 1rem;
+    color: var(--text-light);
+    opacity: 0.7;
+}
+
+/* Navigation */
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+    margin-right: 20px;
+}
+
+nav ul li {
+    position: relative;
+}
+
+nav ul li a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+    color: var(--primary-color);
+    background-color: rgba(0, 255, 157, 0.1);
+}
+
+nav ul li a.disabled {
+    color: #666;
+    pointer-events: none;
+}
+
+/* Dropdown for Socials */
+.socials .dropdown {
+    display: none;
+    position: absolute;
+    background-color: var(--terminal-bg);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    border: 1px solid var(--terminal-border);
+    border-radius: 4px;
+    top: 40px;
+    right: 0;
+    z-index: 11;
+}
+
+.socials .dropdown.active {
+    display: block;
+}
+
+.dropdown a {
+    color: var(--text-light);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown a:hover {
+    background-color: rgba(0, 255, 157, 0.1);
+}
+
+/* Main Content */
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 80px 20px 20px;
+    z-index: 3;
+}
+
+/* Roadmap Content */
+main.roadmap-content {
+    display: block;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 100px 20px 20px;
+    color: var(--text-light);
+    text-align: left;
+}
+
+main.roadmap-content .back-button {
+    display: block;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    background-color: var(--terminal-bg);
+    padding: 5px 10px;
+    border-radius: 5px;
+    z-index: 1002;
+    position: fixed;
+    top: 130px;
+    left: 20px;
+}
+
+main.roadmap-content .back-button:hover {
+    color: var(--text-light);
+}
+
+main.roadmap-content h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--primary-color);
+    margin: 3rem 0 1.5rem;
+    font-size: 2.2rem;
+    border-bottom: 1px solid rgba(0, 255, 157, 0.3);
+    padding-bottom: 0.5rem;
+    text-align: center;
+}
+
+main.roadmap-content h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--secondary-color);
+    margin: 2rem 0 1rem;
+    font-size: 1.6rem;
+}
+
+main.roadmap-content p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+main.roadmap-content ol {
+    margin: 1rem 0 2rem 2rem;
+}
+
+main.roadmap-content ol li {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+main.roadmap-content ul {
+    list-style-type: disc;
+    margin: 1rem 0 2rem 2rem;
+}
+
+main.roadmap-content ul li {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* Timeline Styling */
+.timeline {
+    position: relative;
+    margin: 2rem 0;
+    padding-left: 40px;
+    border-left: 2px solid var(--primary-color);
+}
+
+.timeline-phase {
+    position: relative;
+    margin-bottom: 3rem;
+}
+
+.timeline-phase::before {
+    content: '';
+    position: absolute;
+    left: -47px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    border: 2px solid var(--background-dark);
+}
+
+.timeline-phase h4 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-phase .phase-period {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.timeline-phase ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.timeline-phase li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+}
+
+.timeline-phase li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+/* CA Box (Desktop) */
+.ca-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--terminal-bg);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--terminal-border);
+    z-index: 1000;
+}
+
+.ca-label {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.ca-address {
+    font-family: 'Courier New', monospace;
+    color: var(--text-light);
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.ca-box button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: var(--text-light);
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.ca-box button:hover {
+    opacity: 1;
+}
+
+/* Chatbox */
+.chatbox {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 400px;
+    height: 400px;
+    background-color: var(--terminal-bg);
+    border: 1px solid var(--terminal-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.chatbox-header {
+    background-color: #333;
+    color: var(--text-light);
+    padding: 10px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbox-body {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    color: var(--text-light);
+}
+
+.chatbox-body .message {
+    margin: 12px 0;
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 15px;
+    line-height: 1.5;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.chatbox-body .user-message {
+    background-color: rgba(0, 255, 157, 0.2);
+    color: var(--text-light);
+    margin-left: 20%;
+    text-align: right;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.chatbox-body .agent-message {
+    background-color: rgba(157, 0, 255, 0.2);
+    color: var(--text-light);
+    margin-right: 20%;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Buffering Animation */
+.buffering-dots {
+    margin: 12px 0;
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background-color: rgba(157, 0, 255, 0.2);
+    color: var(--text-light);
+    margin-right: 20%;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+}
+
+.buffering-dots span {
+    display: inline-block;
+    animation: dot-blink 1.4s infinite both;
+}
+
+.buffering-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.buffering-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dot-blink {
+    0%, 20%, 50%, 80%, 100% {
+        opacity: 1;
+    }
+    40% {
+        opacity: 0.3;
+    }
+}
+
+/* Typing Animation */
+.agent-message.typing {
+    white-space: pre-wrap;
+    overflow: hidden;
+    display: inline-block;
+}
+
+/* Narrating Indicator */
+.narrating-indicator {
+    margin: 12px 0;
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background-color: rgba(157, 0, 255, 0.2);
+    color: var(--text-light);
+    margin-right: 20%;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* Chatbox Input */
+.chatbox-input {
+    display: flex;
+    padding: 10px;
+    margin-top: auto;
+}
+
+.chatbox-input input {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid var(--terminal-border);
+    border-radius: 5px 0 0 5px;
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+}
+
+.chatbox-input button {
+    padding: 5px 10px;
+    background-color: var(--primary-color);
+    color: var(--background-dark);
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+}
+
+.chatbox-input button:hover {
+    background-color: #00cc7a;
+}
+
+/* Footer */
+footer {
+    height: 50px;
+}
+
+/* Utility Class */
+.hidden {
+    display: none;
+}
+
+/* Hamburger Menu Button */
+.menu-toggle {
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-light);
+    cursor: pointer;
+    z-index: 1001;
+}
+
+/* Navigation Menu */
+nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Mobile Main Content */
+.mobile-main-content {
+    display: none;
+}
+
+.mobile-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.buy-mana-button {
+    display: block;
+    color: var(--text-light);
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.buy-mana-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: var(--text-light);
+}
+
+.ca-copy {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.ca-copy:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.ca-copy .ca-label {
+    color: var(--text-light);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.ca-copy-button {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.ca-copy-button:hover,
+.ca-copy .ca-label:hover {
+    color: var(--text-light);
+}
+
+/* Hide the CA address visually but keep it for copying */
+.ca-address.hidden {
+    display: none;
+}
+
+/* Chatbox Toggle Styles */
+.chatbox-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Default: Show chatbox body and input on desktop */
+.chatbox-body,
+.chatbox-input {
+    display: block;
+}
+
+/* Chatbox Minimize/Maximize Buttons */
+.chatbox-minimize {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 24px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: inline-block !important;
+}
+
+.chatbox-maximize {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: var(--terminal-bg);
+    color: var(--text-light);
+    padding: 5px 10px;
+    border: 1px solid var(--terminal-border);
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* Removed CSS animations since we're switching video sources */
+#background-video {
+    transition: opacity 1s ease; /* Smooth transition for video switching */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        font-size: 1rem;
+    }
+
+    header {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+
+    nav {
+        display: none;
+        position: absolute;
+        top: 80px;
+        right: 0;
+        background: var(--terminal-bg);
+        width: 200px;
+        z-index: 1000;
+        border: 1px solid var(--terminal-border);
+    }
+
+    nav.open {
+        display: block;
+    }
+
+    nav ul {
+        flex-direction: column;
+        padding: 10px;
+        gap: 0.5rem;
+    }
+
+    nav ul li {
+        margin: 10px 0;
+    }
+
+    nav ul li a {
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 1.1rem;
+    }
+
+    /* Adjust logo position */
+    .logo {
+        text-align: left;
+        padding-left: 20px;
+    }
+
+    /* Position "Plant a digital seed" button at the cow's feet on mobile */
+    #explore-button {
+        position: fixed;
+        bottom: 10vh;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0;
+        font-size: 1rem;
+        padding: 8px 16px;
+        z-index: 2;
+    }
+
+    /* Show mobile main content */
+    .mobile-main-content {
+        display: block;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Position Buy $MANA and CA buttons at top: 4vh */
+    .mobile-actions {
+        position: absolute;
+        top: 4vh;
+        left: 50%;
+        transform: translateX(-50%);
+        gap: 20px;
+        padding: 10px 0;
+        z-index: 10;
+    }
+
+    /* Adjust CA box for mobile */
+    .ca-box {
+        display: none;
+    }
+
+    /* Ensure background video takes full width */
+    #background-video {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        z-index: -1;
+    }
+
+    /* Enlarge static image and transition video on mobile */
+    .intro-image {
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
+        object-fit: cover;
+    }
+
+    #transition-video {
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
+        object-fit: cover;
+    }
+
+    /* Hide "Buy $MANA" in nav since it's in main content */
+    nav ul li:first-child {
+        display: none;
+    }
+
+    /* Improved Chatbox on Mobile */
+    .chatbox {
+        width: 90vw; /* Increased width for better visibility */
+        height: 50vh; /* Increased height to show more conversation */
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Center alignment */
+        bottom: 20px;
+        background: rgba(10, 10, 16, 0.9); /* Slightly more transparent background */
+        border: none; /* Remove border for a cleaner look */
+        border-radius: 12px; /* More rounded corners */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+    }
+
+    .chatbox.minimized {
+        display: none !important;
+    }
+
+    .chatbox-header {
+        background: rgba(0, 0, 0, 0.5); /* Darker header background */
+        color: var(--primary-color); /* Brighter text color */
+        padding: 8px 10px; /* Reduced padding for compactness */
+        font-size: 1.2rem; /* Slightly larger font */
+        border-top-left-radius: 12px; /* Match chatbox border-radius */
+        border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chatbox-body {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        color: var(--text-light);
+        scrollbar-width: thin; /* For Firefox */
+        scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.3); /* For Firefox */
+    }
+
+    .chatbox-body::-webkit-scrollbar {
+        width: 6px; /* For Chrome, Safari, Edge */
+    }
+
+    .chatbox-body::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .chatbox-body::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 3px;
+    }
+
+    .chatbox-body .message {
+        margin: 8px 0;
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 18px;
+        font-size: 16px; /* Larger font size for readability */
+        line-height: 1.4;
+    }
+
+    .chatbox-body .user-message {
+        background-color: rgba(0, 255, 157, 0.3); /* Slightly brighter background */
+        margin-left: 15%;
+    }
+
+    .chatbox-body .agent-message {
+        background-color: rgba(157, 0, 255, 0.3); /* Slightly brighter background */
+        margin-right: 15%;
+    }
+
+    .buffering-dots {
+        margin: 8px 0;
+        max-width: 85%;
+        padding: 10px 14px;
+        font-size: 16px;
+    }
+
+    .narrating-indicator {
+        margin: 8px 0;
+        max-width: 85%;
+        padding: 10px 14px;
+        font-size: 16px;
+    }
+
+    .chatbox-input {
+        display: flex;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.5); /* Darker input background */
+        border-bottom-left-radius: 12px; /* Match chatbox border-radius */
+        border-bottom-right-radius: 12px;
+    }
+
+    .chatbox-input input {
+        flex: 1;
+        padding: 8px 12px; /* Increased padding for better touch target */
+        border: none; /* Remove border for a cleaner look */
+        border-radius: 20px; /* Rounded input field */
+        background-color: rgba(255, 255, 255, 0.1); /* Light background for contrast */
+        color: var(--text-light);
+        font-size: 16px; /* Larger font size */
+        outline: none; /* Remove outline on focus */
+    }
+
+    .chatbox-input button {
+        display: none; /* Hide the send button on mobile; Enter key is sufficient */
+    }
+
+    .timeline-phase h4 {
+        font-size: 1.6rem;
+    }
+
+    .timeline-phase .phase-period {
+        font-size: 1rem;
+    }
+
+    .timeline-phase li {
+        font-size: 1rem;
+    }
+
+    /* Fixed Back Button on Roadmap for Mobile */
+    main.roadmap-content .back-button {
+        position: fixed;
+        top: 130px;
+        left: 20px;
+        z-index: 1002;
+    }
+}
+
+/* Desktop: Hide Buy $MANA button in main content */
+@media (min-width: 769px) {
+    .buy-mana-button {
+        display: none;
+    }
+
+    .chatbox {
+        display: flex;
+        width: 400px;
+        height: 400px;
+        border-radius: 12px; /* Match mobile styling */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
+    }
+
+    .chatbox.minimized {
+        display: none !important;
+    }
+
+    /* Ensure input width matches chatbox width on desktop */
+    .chatbox-header {
+        background: rgba(0, 0, 0, 0.5);
+        color: var(--primary-color);
+        padding: 8px 10px;
+        font-size: 1.2rem;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .chatbox-body {
+        padding: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.3);
+    }
+
+    .chatbox-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chatbox-body::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .chatbox-body::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 3px;
+    }
+
+    .chatbox-body .message {
+        margin: 8px 0;
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .chatbox-body .user-message {
+        background-color: rgba(0, 255, 157, 0.3);
+        margin-left: 15%;
+    }
+
+    .chatbox-body .agent-message {
+        background-color: rgba(157, 0, 255, 0.3);
+        margin-right: 15%;
+    }
+
+    .buffering-dots {
+        margin: 8px 0;
+        max-width: 85%;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .narrating-indicator {
+        margin: 8px 0;
+        max-width: 85%;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .chatbox-input {
+        display: flex;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.5);
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        gap: 0; /* Remove gap between input and button */
+    }
+
+    .chatbox-input input {
+        flex: 1;
+        padding: 8px 12px;
+        border: none; /* Remove border for a cleaner look */
+        border-radius: 20px 0 0 20px; /* Rounded on the left side */
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+        font-size: 14px;
+        outline: none;
+        margin: 0; /* Remove any margins */
+    }
+
+    .chatbox-input button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 0 20px 20px 0; /* Rounded on the right side */
+        background-color: var(--primary-color);
+        color: var(--background-dark);
+        font-size: 14px;
+        cursor: pointer;
+        margin: 0; /* Remove any margins */
+    }
+
+    .chatbox-input button:hover {
+        background-color: #00cc7a;
+    }
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mana on Sol</title>
+    <link rel="stylesheet" href="styles.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+    <!-- Intro Section -->
+    <div id="intro-section">
+        <img src="assets/static-image.jpg" alt="Mana on Sol Intro Image" class="intro-image" loading="lazy">
+        <button id="explore-button">Plant a digital seed</button>
+        <video id="transition-video" class="hidden" playsinline webkit-playsinline muted loading="lazy">
+            <source src="assets/transition-video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Main Website (Hidden Initially) -->
+    <div id="main-website" class="hidden">
+        <!-- Background Image Containers -->
+        <div class="background-image-left hidden"></div>
+        <div class="background-image-right hidden"></div>
+
+        <!-- Background Video -->
+        <video id="background-video" autoplay loop muted playsinline webkit-playsinline loading="lazy">
+            <source src="assets/animation-1.mp4" type="video/mp4">
+        </video>
+
+        <!-- Static Image for Transition -->
+        <img id="static-image-transition" src="assets/static-image.jpg" alt="Static Image Transition" class="hidden" loading="lazy">
+
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <h1>MANA</h1>
+                <p>Meme Anarchic Numismatic Asset</p>
+            </div>
+            <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+            <nav id="nav-menu">
+                <ul>
+                    <li><a href="https://raydium.io/swap/?inputMint=sol&outputMint=Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump" target="_blank">Buy $MANA</a></li>
+                    <li><a href="roadmap.html">Roadmap</a></li>
+                    <li><a href="#" class="disabled">Launchpad Coming Soon</a></li>
+                    <li><a href="https://www.infinitebackrooms.com">Infinite Backrooms</a></li>
+                    <li class="socials">
+                        <a href="#" onclick="toggleDropdown(event)">Socials ▼</a>
+                        <div class="dropdown" id="socials-dropdown">
+                            <a href="https://x.com/manaonsolcto" target="_blank">X</a>
+                            <a href="https://t.me/Mana_Sol" target="_blank">Telegram</a>
+                            <a href="https://dexscreener.com/solana/6nteq6b3lr31egskj6hnhbakwenwrygn68y4mb91cgco" target="_blank">Dexscreener</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="mobile-main-content">
+                <div class="mobile-actions">
+                    <a href="https://raydium.io/swap/?inputMint=sol&outputMint=Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump" target="_blank" class="buy-mana-button">Buy $MANA</a>
+                    <span class="ca-copy">
+                        <span class="ca-label">CA</span>
+                        <button class="ca-copy-button" onclick="copyCA()">📋</button>
+                        <span class="ca-address hidden">Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump</span>
+                    </span>
+                </div>
+            </div>
+        </main>
+
+        <!-- CA Box (Moved back inside #main-website) -->
+        <div class="ca-box">
+            <span class="ca-label">CA: Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump</span>
+            <button class="ca-copy-button" onclick="copyCA()">📋</button>
+        </div>
+
+        <!-- Chatbox -->
+        <div class="chatbox" id="chatbox">
+            <div class="chatbox-header">
+                <span onclick="toggleChatboxBody()">Chat with Mana</span>
+                <button class="chatbox-minimize" onclick="minimizeChatbox()">-</button>
+            </div>
+            <div class="chatbox-body" id="chatbox-body">
+                <!-- Messages will be added dynamically -->
+            </div>
+            <div class="chatbox-input">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <button class="chatbox-maximize hidden" onclick="maximizeChatbox()">Chat with Mana +</button>
+
+        <!-- Footer -->
+        <footer>
+            <!-- Empty for now -->
+        </footer>
+    </div>
+
+    <script src="script.js?v=1.0.3"></script>
+</body>
+</html>
