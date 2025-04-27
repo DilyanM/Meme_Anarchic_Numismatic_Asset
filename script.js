@@ -63,84 +63,60 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add Enter key listener for chatbox input
+    // Add Enter key listener for chatbox input (disabled, but keeping for future use)
     const userInput = document.getElementById('user-input');
     if (userInput) {
         userInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Prevent form submission or newline
+                event.preventDefault();
                 sendMessage();
             }
         });
     }
+
+    // Handle Roadmap dropdown click to play animation-3.mp4 once, then redirect
+    const roadmapLinks = document.querySelectorAll('#roadmap-dropdown a');
+    roadmapLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const href = link.getAttribute('href');
+
+            if (backgroundVideo) {
+                const animation3Src = '/assets/animation-3.mp4';
+                backgroundVideo.removeAttribute('loop');
+                backgroundVideo.style.opacity = '0';
+                setTimeout(() => {
+                    backgroundVideo.src = animation3Src;
+                    backgroundVideo.load();
+                    backgroundVideo.onloadeddata = () => {
+                        backgroundVideo.play().catch(error => {
+                            console.error('Animation-3 video playback failed:', error);
+                            window.location.href = href;
+                        });
+                        backgroundVideo.style.opacity = '1';
+                    };
+                    backgroundVideo.onerror = () => {
+                        console.error('Failed to load animation-3 video:', animation3Src);
+                        window.location.href = href;
+                    };
+                    backgroundVideo.onended = () => {
+                        window.location.href = href;
+                    };
+                }, 500);
+            } else {
+                window.location.href = href;
+            }
+        });
+    });
 });
 
 // Chatbox Logic
 async function sendMessage() {
-    const userInput = document.getElementById('user-input');
-    const chatboxBody = document.getElementById('chatbox-body');
-    const message = userInput.value.trim();
-
-    if (!message) return; // Ignore empty messages
-
-    // Clear input
-    userInput.value = '';
-    userInput.focus();
-
-    // Append user message
-    const userMessage = document.createElement('div');
-    userMessage.className = 'message user-message';
-    userMessage.textContent = message;
-    chatboxBody.appendChild(userMessage);
-    chatboxBody.scrollTop = chatboxBody.scrollHeight;
-
-    // Show buffering animation
-    const buffering = document.createElement('div');
-    buffering.className = 'buffering-dots';
-    buffering.innerHTML = '<span>.</span><span>.</span><span>.</span>';
-    chatboxBody.appendChild(buffering);
-    chatboxBody.scrollTop = chatboxBody.scrollHeight;
-
-    try {
-        // Call LLM proxy function
-        const llmResponse = await fetchLLMResponse(message);
-
-        // Remove buffering animation
-        buffering.remove();
-
-        // Append agent message (but don’t start typing yet)
-        const agentMessage = document.createElement('div');
-        agentMessage.className = 'message agent-message typing';
-        chatboxBody.appendChild(agentMessage);
-        chatboxBody.scrollTop = chatboxBody.scrollHeight;
-
-        // Show narrating indicator
-        const narratingIndicator = document.createElement('div');
-        narratingIndicator.className = 'narrating-indicator';
-        narratingIndicator.textContent = 'Narrating...';
-        chatboxBody.appendChild(narratingIndicator);
-        chatboxBody.scrollTop = chatboxBody.scrollHeight;
-
-        // Start narration and wait for audio to be ready
-        const narrationPromise = narrateResponse(llmResponse, narratingIndicator, agentMessage);
-
-        // Wait for narration to complete
-        await narrationPromise;
-
-        // Remove typing class after animation
-        agentMessage.classList.remove('typing');
-    } catch (error) {
-        console.error('Error processing message:', error);
-        buffering.remove();
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'message agent-message';
-        errorMessage.textContent = `Oops, something went wrong: ${error.message}. Try again!`;
-        chatboxBody.appendChild(errorMessage);
-        chatboxBody.scrollTop = chatboxBody.scrollHeight;
-    }
+    // Disabled functionality - input and button are disabled in HTML
+    console.log('Message sending is disabled.');
 }
 
-// Fetch LLM Response via Netlify Function
+// Fetch LLM Response via Netlify Function (kept for future use)
 async function fetchLLMResponse(message) {
     try {
         const response = await fetch('/.netlify/functions/llm-proxy', {
@@ -160,11 +136,11 @@ async function fetchLLMResponse(message) {
         return data.response;
     } catch (error) {
         console.error('Fetch LLM Response Error:', error.message);
-        throw error; // Re-throw to display in chatbox
+        throw error;
     }
 }
 
-// Typing animation
+// Typing animation (kept for future use)
 async function typeResponse(element, text) {
     element.textContent = '';
     const words = text.split(' ');
@@ -177,14 +153,13 @@ async function typeResponse(element, text) {
     }
 }
 
-// Voice narration with ethereal effects (via Netlify Function)
+// Voice narration with ethereal effects (via Netlify Function, kept for future use)
 async function narrateResponse(text, narratingIndicator, agentMessage) {
-    let hasCleanedUp = false; // Flag to prevent multiple cleanups
+    let hasCleanedUp = false;
 
     try {
         console.log('Starting narration for text:', text);
 
-        // Call Netlify Function to proxy ElevenLabs API
         console.time('TTS Proxy Call');
         const response = await fetch('/.netlify/functions/tts-proxy', {
             method: 'POST',
@@ -203,23 +178,19 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
 
-        // Set up Web Audio API for reverb and sound effect overlay
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-        // Resume audio context to ensure playback (some browsers suspend it)
         if (audioContext.state === 'suspended') {
             await audioContext.resume();
             console.log('AudioContext resumed');
         }
 
-        // Main narration audio (MANA voice) with reduced reverb
         const narrationAudio = new Audio(audioUrl);
         const narrationSource = audioContext.createMediaElementSource(narrationAudio);
         const convolver = audioContext.createConvolver();
         const narrationGain = audioContext.createGain();
 
-        // Create impulse response for reduced reverb
-        const duration = 0.5; // Reduced from 2 to 0.5 seconds
+        const duration = 0.5;
         const sampleRate = audioContext.sampleRate;
         const buffer = audioContext.createBuffer(2, sampleRate * duration, sampleRate);
         for (let channel = 0; channel < 2; channel++) {
@@ -233,18 +204,16 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
         narrationSource.connect(convolver);
         convolver.connect(narrationGain);
         narrationGain.connect(audioContext.destination);
-        narrationGain.gain.value = 0.4; // Reduced from 0.8 to 0.4 for less reverb intensity
+        narrationGain.gain.value = 0.4;
 
-        // Ethereal sound effect (background hum)
         const effectAudio = new Audio('/assets/ethereal-hum.mp3');
-        effectAudio.loop = true; // Loop the sound effect
+        effectAudio.loop = true;
         const effectSource = audioContext.createMediaElementSource(effectAudio);
         const effectGain = audioContext.createGain();
         effectSource.connect(effectGain);
         effectGain.connect(audioContext.destination);
-        effectGain.gain.value = 0.2; // Low volume for background effect
+        effectGain.gain.value = 0.2;
 
-        // Select the video element to animate
         const animatedVideo = document.getElementById('background-video');
         if (!animatedVideo) {
             console.error('Background video element not found. Tried #background-video');
@@ -252,56 +221,20 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
             console.log('Background video element found:', animatedVideo);
         }
 
-        // Remove narrating indicator
         narratingIndicator.remove();
 
-        // Play background effect audio
         effectAudio.play().catch(error => {
             console.error('Effect audio playback failed:', error);
         });
 
-        // Track the current video state
-        let currentVideoState = 'animation-1'; // Assume starting with animation-1
+        let currentVideoState = 'animation-1';
 
-        // Trigger animation transition and start typing when the narration audio starts playing
         narrationAudio.onplaying = () => {
             console.log('Narration audio started playing');
             if (animatedVideo) {
-                // Switch to animation-2 video source
                 const animation2Src = '/assets/animation-2.mp4';
                 console.log('Switching to animation-2:', animation2Src);
-                animatedVideo.style.opacity = '0'; // Fade out
-                const transitionDuration = 500; // Half of the 1s transition
-                setTimeout(() => {
-                    animatedVideo.src = animation2Src;
-                    animatedVideo.load();
-                    // Wait for the video to be ready before playing
-                    animatedVideo.onloadeddata = () => {
-                        animatedVideo.play().catch(error => {
-                            console.error('Animation-2 video playback failed:', error);
-                        });
-                        animatedVideo.style.opacity = '1'; // Fade in
-                        currentVideoState = 'animation-2'; // Update state
-                        console.log('Successfully switched to animation-2');
-                    };
-                    animatedVideo.onerror = () => {
-                        console.error('Failed to load animation-2 video:', animation2Src);
-                    };
-                }, transitionDuration);
-            }
-            // Start typing animation now that narration has started
-            typeResponse(agentMessage, text);
-        };
-
-        // Fallback: Trigger immediately after calling play() in case onplaying doesn't fire
-        narrationAudio.play().catch(error => {
-            console.error('Narration audio playback failed:', error);
-        }).then(() => {
-            console.log('Narration audio play() called');
-            if (animatedVideo) {
-                const animation2Src = '/assets/animation-2.mp4';
-                console.log('Switching to animation-2 (fallback):', animation2Src);
-                animatedVideo.style.opacity = '0'; // Fade out
+                animatedVideo.style.opacity = '0';
                 const transitionDuration = 500;
                 setTimeout(() => {
                     animatedVideo.src = animation2Src;
@@ -310,8 +243,36 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
                         animatedVideo.play().catch(error => {
                             console.error('Animation-2 video playback failed:', error);
                         });
-                        animatedVideo.style.opacity = '1'; // Fade in
-                        currentVideoState = 'animation-2'; // Update state
+                        animatedVideo.style.opacity = '1';
+                        currentVideoState = 'animation-2';
+                        console.log('Successfully switched to animation-2');
+                    };
+                    animatedVideo.onerror = () => {
+                        console.error('Failed to load animation-2 video:', animation2Src);
+                    };
+                }, transitionDuration);
+            }
+            typeResponse(agentMessage, text);
+        };
+
+        narrationAudio.play().catch(error => {
+            console.error('Narration audio playback failed:', error);
+        }).then(() => {
+            console.log('Narration audio play() called');
+            if (animatedVideo) {
+                const animation2Src = '/assets/animation-2.mp4';
+                console.log('Switching to animation-2 (fallback):', animation2Src);
+                animatedVideo.style.opacity = '0';
+                const transitionDuration = 500;
+                setTimeout(() => {
+                    animatedVideo.src = animation2Src;
+                    animatedVideo.load();
+                    animatedVideo.onloadeddata = () => {
+                        animatedVideo.play().catch(error => {
+                            console.error('Animation-2 video playback failed:', error);
+                        });
+                        animatedVideo.style.opacity = '1';
+                        currentVideoState = 'animation-2';
                         console.log('Successfully switched to animation-2 (fallback)');
                     };
                     animatedVideo.onerror = () => {
@@ -319,11 +280,9 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
                     };
                 }, transitionDuration);
             }
-            // Start typing animation now that narration has started
             typeResponse(agentMessage, text);
         });
 
-        // Ensure the audio ends properly and switch back to animation-1
         return new Promise((resolve) => {
             narrationAudio.onended = () => {
                 console.log('Narration audio ended (onended event fired)');
@@ -344,7 +303,6 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
     } catch (error) {
         console.error('Error narrating response:', error);
         if (narratingIndicator) narratingIndicator.remove();
-        // Fallback to SpeechSynthesis
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
@@ -356,36 +314,32 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
             if (fallbackVoice) utterance.voice = fallbackVoice;
             window.speechSynthesis.speak(utterance);
         }
-        throw error; // Re-throw to allow sendMessage to handle the error
+        throw error;
     }
 }
 
 // Helper function to clean up and switch back to animation-1
 function cleanupAndSwitchBack(animatedVideo, effectAudio, audioContext, audioUrl, resolve, currentVideoState) {
-    // Pause effect audio (synchronous, no Promise)
     try {
         effectAudio.pause();
     } catch (error) {
         console.error('Failed to pause effect audio:', error);
     }
 
-    // Close audio context if not already closed
     if (audioContext.state !== 'closed') {
         audioContext.close().catch(error => {
             console.error('Failed to close AudioContext:', error);
         });
     }
 
-    // Revoke the audio URL
     URL.revokeObjectURL(audioUrl);
 
-    // Transition back to animation-1
     if (animatedVideo) {
         console.log('Current video state:', currentVideoState);
         if (currentVideoState === 'animation-2') {
             const animation1Src = '/assets/animation-1.mp4';
             console.log('Switching back to animation-1:', animation1Src);
-            animatedVideo.style.opacity = '0'; // Fade out
+            animatedVideo.style.opacity = '0';
             setTimeout(() => {
                 animatedVideo.src = animation1Src;
                 animatedVideo.load();
@@ -393,7 +347,7 @@ function cleanupAndSwitchBack(animatedVideo, effectAudio, audioContext, audioUrl
                     animatedVideo.play().catch(error => {
                         console.error('Animation-1 video playback failed:', error);
                     });
-                    animatedVideo.style.opacity = '1'; // Fade in
+                    animatedVideo.style.opacity = '1';
                     console.log('Successfully switched back to animation-1');
                 };
                 animatedVideo.onerror = () => {
@@ -421,23 +375,43 @@ function copyCA() {
     });
 }
 
-// Socials Dropdown Logic
+// Socials and Roadmap Dropdown Logic
 function toggleDropdown(event) {
     event.preventDefault();
-    const dropdown = document.getElementById('socials-dropdown');
-    dropdown.classList.toggle('active');
+    const target = event.currentTarget;
+    const dropdownId = target.nextElementSibling.id;
+    const dropdown = document.getElementById(dropdownId);
+    const isActive = dropdown.classList.contains('active');
+
+    // Close all dropdowns
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+
+    // Toggle the clicked dropdown
+    if (!isActive) {
+        dropdown.classList.add('active');
+    }
 }
 
 document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('socials-dropdown');
-    const socialsTab = document.querySelector('.socials a');
-    if (!dropdown.contains(event.target) && !socialsTab.contains(event.target)) {
-        dropdown.classList.remove('active');
+    const dropdowns = document.querySelectorAll('.dropdown');
+    const tabs = document.querySelectorAll('.socials a, .roadmap a');
+    let isInsideDropdownOrTab = false;
+
+    dropdowns.forEach(dropdown => {
+        if (dropdown.contains(event.target)) isInsideDropdownOrTab = true;
+    });
+    tabs.forEach(tab => {
+        if (tab.contains(event.target)) isInsideDropdownOrTab = true;
+    });
+
+    if (!isInsideDropdownOrTab) {
+        dropdowns.forEach(dropdown => dropdown.classList.remove('active'));
     }
 });
 
 // Chatbox Logic (Toggle Body and Input)
 function toggleChatboxBody() {
+    const chatbox = document.getElementById('chatbox');
     const chatboxBody = document.getElementById('chatbox-body');
     const chatboxInput = document.querySelector('.chatbox-input');
     const chatboxHeader = document.querySelector('.chatbox-header');
@@ -445,22 +419,38 @@ function toggleChatboxBody() {
     chatboxBody.style.display = chatboxBody.style.display === 'block' ? 'none' : 'block';
     chatboxInput.style.display = chatboxInput.style.display === 'block' ? 'none' : 'block';
     chatboxHeader.classList.toggle('open');
+
+    // Toggle minimized class based on visibility
+    if (chatboxBody.style.display === 'none') {
+        chatbox.classList.add('minimized');
+    } else {
+        chatbox.classList.remove('minimized');
+    }
 }
 
 // Minimize Chatbox
-function minimizeChatbox() {
-    const chatbox = document.getElementById('chatbox');
-    const maximizeButton = document.querySelector('.chatbox-maximize');
-    chatbox.classList.add('minimized');
-    maximizeButton.classList.remove('hidden');
+function minimizeChatbox(event) {
+    event.stopPropagation();
+    const chatboxBody = document.getElementById('chatbox-body');
+    const chatboxInput = document.querySelector('.chatbox-input');
+    const chatboxHeader = document.querySelector('.chatbox-header');
+
+    chatboxBody.style.display = 'none';
+    chatboxInput.style.display = 'none';
+    chatboxHeader.classList.remove('open');
+    document.getElementById('chatbox').classList.add('minimized');
 }
 
 // Maximize Chatbox
 function maximizeChatbox() {
-    const chatbox = document.getElementById('chatbox');
-    const maximizeButton = document.querySelector('.chatbox-maximize');
-    chatbox.classList.remove('minimized');
-    maximizeButton.classList.add('hidden');
+    const chatboxBody = document.getElementById('chatbox-body');
+    const chatboxInput = document.querySelector('.chatbox-input');
+    const chatboxHeader = document.querySelector('.chatbox-header');
+
+    chatboxBody.style.display = 'block';
+    chatboxInput.style.display = 'block';
+    chatboxHeader.classList.add('open');
+    document.getElementById('chatbox').classList.remove('minimized');
 }
 
 // Menu Logic

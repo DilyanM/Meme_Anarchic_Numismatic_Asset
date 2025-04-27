@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mana on Sol</title>
-    <link rel="stylesheet" href="styles.css?v=1.0.3">
+    <link rel="stylesheet" href="styles.css?v=1.0.8">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
@@ -43,9 +43,16 @@
             <nav id="nav-menu">
                 <ul>
                     <li><a href="https://raydium.io/swap/?inputMint=sol&outputMint=Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump" target="_blank">Buy $MANA</a></li>
-                    <li><a href="roadmap.html">Roadmap</a></li>
+                    <li class="roadmap">
+                        <a href="#" onclick="toggleDropdown(event)">Roadmap ▼</a>
+                        <div class="dropdown" id="roadmap-dropdown">
+                            <a href="roadmap.html#origin-story">Origin Story</a>
+                            <a href="roadmap.html#roadmap">Roadmap</a>
+                            <a href="roadmap.html#guiding-principles">Guiding Principles</a>
+                        </div>
+                    </li>
                     <li><a href="#" class="disabled">Launchpad Coming Soon</a></li>
-                    <li><a href="https://www.infinitebackrooms.com">Infinite Backrooms</a></li>
+                    <li><a href="https://www.infinitebackrooms.com/dreams/conversation-1714479738-scenario-vanilla-backrooms-txt">Infinite Backrooms</a></li>
                     <li class="socials">
                         <a href="#" onclick="toggleDropdown(event)">Socials ▼</a>
                         <div class="dropdown" id="socials-dropdown">
@@ -72,27 +79,30 @@
             </div>
         </main>
 
-        <!-- CA Box (Moved back inside #main-website) -->
+        <!-- CA Box -->
         <div class="ca-box">
             <span class="ca-label">CA: Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump</span>
             <button class="ca-copy-button" onclick="copyCA()">📋</button>
         </div>
 
         <!-- Chatbox -->
-        <div class="chatbox" id="chatbox">
-            <div class="chatbox-header">
-                <span onclick="toggleChatboxBody()">Chat with Mana</span>
-                <button class="chatbox-minimize" onclick="minimizeChatbox()">-</button>
+        <div class="chatbox minimized" id="chatbox">
+            <div class="chatbox-header" onclick="toggleChatboxBody()">
+                <span>Chat with Mana</span>
+                <button class="chatbox-minimize">-</button>
             </div>
             <div class="chatbox-body" id="chatbox-body">
-                <!-- Messages will be added dynamically -->
+                <p class="chat-placeholder">Chat with MANA coming soon ...</p>
+                <div class="chat-messages">
+                    <!-- Messages will be added dynamically -->
+                </div>
             </div>
             <div class="chatbox-input">
-                <input type="text" id="user-input" placeholder="Type your message...">
-                <button onclick="sendMessage()">Send</button>
+                <input type="text" id="user-input" placeholder="Type your message..." disabled>
+                <button onclick="sendMessage()" disabled>Send</button>
             </div>
         </div>
-        <button class="chatbox-maximize hidden" onclick="maximizeChatbox()">Chat with Mana +</button>
+        <button class="chatbox-maximize" onclick="maximizeChatbox()">Chat with Mana +</button>
 
         <!-- Footer -->
         <footer>
@@ -100,6 +110,6 @@
         </footer>
     </div>
 
-    <script src="script.js?v=1.0.3"></script>
+    <script src="script.js?v=1.0.7"></script>
 </body>
 </html>
