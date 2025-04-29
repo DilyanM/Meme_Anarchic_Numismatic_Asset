@@ -388,13 +388,13 @@ main.roadmap-content ul li {
 
 /* Style links in roadmap-content (used in ecosystem.html) */
 main.roadmap-content a {
-    color: var(--text-light);
+    color: var(--primary-color); /* Default to green */
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 main.roadmap-content a:hover {
-    color: var(--primary-color);
+    color: var(--text-light); /* Hover to light gray */
 }
 
 /* Timeline Styling */
