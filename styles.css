@@ -120,6 +120,13 @@ body {
     opacity: 0.3; /* Slightly lowered for better text readability */
 }
 
+/* Background for ecosystem page */
+.background-image.ecosystem-background {
+    background: url('assets/tree-background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    opacity: 0.3; /* Match roadmap opacity */
+}
+
 /* Background Video */
 #background-video {
     position: fixed;

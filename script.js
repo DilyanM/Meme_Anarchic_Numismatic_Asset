@@ -108,6 +108,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Handle Ecosystem tab click to play animation-3.mp4 once, then redirect
+    const ecosystemLink = document.querySelector('nav ul li a[href="ecosystem.html"]');
+    if (ecosystemLink) {
+        ecosystemLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            const href = ecosystemLink.getAttribute('href');
+
+            if (backgroundVideo) {
+                const animation3Src = '/assets/animation-3.mp4';
+                backgroundVideo.removeAttribute('loop');
+                backgroundVideo.style.opacity = '0';
+                setTimeout(() => {
+                    backgroundVideo.src = animation3Src;
+                    backgroundVideo.load();
+                    backgroundVideo.onloadeddata = () => {
+                        backgroundVideo.play().catch(error => {
+                            console.error('Animation-3 video playback failed:', error);
+                            window.location.href = href;
+                        });
+                        backgroundVideo.style.opacity = '1';
+                    };
+                    backgroundVideo.onerror = () => {
+                        console.error('Failed to load animation-3 video:', animation3Src);
+                        window.location.href = href;
+                    };
+                    backgroundVideo.onended = () => {
+                        window.location.href = href;
+                    };
+                }, 500);
+            } else {
+                window.location.href = href;
+            }
+        });
+    }
 });
 
 // Chatbox Logic
@@ -185,206 +220,83 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
             console.log('AudioContext resumed');
         }
 
-        const narrationAudio = new Audio(audioUrl);
-        const narrationSource = audioContext.createMediaElementSource(narrationAudio);
+        const source = audioContext.createBufferSource();
+
+        const audioBuffer = await audioContext.decodeAudioData(await audioBlob.arrayBuffer());
+        source.buffer = audioBuffer;
+
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = 1.0;
+
+        const pannerNode = audioContext.createStereoPanner();
+        pannerNode.pan.value = 0;
+
         const convolver = audioContext.createConvolver();
-        const narrationGain = audioContext.createGain();
+        const reverbResponse = await fetch('/assets/reverb-impulse.wav');
+        const reverbArrayBuffer = await reverbResponse.arrayBuffer();
+        convolver.buffer = await audioContext.decodeAudioData(reverbArrayBuffer);
 
-        const duration = 0.5;
-        const sampleRate = audioContext.sampleRate;
-        const buffer = audioContext.createBuffer(2, sampleRate * duration, sampleRate);
-        for (let channel = 0; channel < 2; channel++) {
-            const data = buffer.getChannelData(channel);
-            for (let i = 0; i < data.length; i++) {
-                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
+        const dryGain = audioContext.createGain();
+        dryGain.gain.value = 0.6;
+
+        const wetGain = audioContext.createGain();
+        wetGain.gain.value = 0.4;
+
+        source.connect(dryGain).connect(pannerNode).connect(audioContext.destination);
+        source.connect(convolver).connect(wetGain).connect(pannerNode).connect(audioContext.destination);
+
+        source.start();
+
+        narratingIndicator.classList.remove('hidden');
+
+        source.onended = () => {
+            if (!hasCleanedUp) {
+                hasCleanedUp = true;
+                narratingIndicator.classList.add('hidden');
+                URL.revokeObjectURL(audioUrl);
+                audioContext.close();
             }
-        }
-        convolver.buffer = buffer;
-
-        narrationSource.connect(convolver);
-        convolver.connect(narrationGain);
-        narrationGain.connect(audioContext.destination);
-        narrationGain.gain.value = 0.4;
-
-        const effectAudio = new Audio('/assets/ethereal-hum.mp3');
-        effectAudio.loop = true;
-        const effectSource = audioContext.createMediaElementSource(effectAudio);
-        const effectGain = audioContext.createGain();
-        effectSource.connect(effectGain);
-        effectGain.connect(audioContext.destination);
-        effectGain.gain.value = 0.2;
-
-        const animatedVideo = document.getElementById('background-video');
-        if (!animatedVideo) {
-            console.error('Background video element not found. Tried #background-video');
-        } else {
-            console.log('Background video element found:', animatedVideo);
-        }
-
-        narratingIndicator.remove();
-
-        effectAudio.play().catch(error => {
-            console.error('Effect audio playback failed:', error);
-        });
-
-        let currentVideoState = 'animation-1';
-
-        narrationAudio.onplaying = () => {
-            console.log('Narration audio started playing');
-            if (animatedVideo) {
-                const animation2Src = '/assets/animation-2.mp4';
-                console.log('Switching to animation-2:', animation2Src);
-                animatedVideo.style.opacity = '0';
-                const transitionDuration = 500;
-                setTimeout(() => {
-                    animatedVideo.src = animation2Src;
-                    animatedVideo.load();
-                    animatedVideo.onloadeddata = () => {
-                        animatedVideo.play().catch(error => {
-                            console.error('Animation-2 video playback failed:', error);
-                        });
-                        animatedVideo.style.opacity = '1';
-                        currentVideoState = 'animation-2';
-                        console.log('Successfully switched to animation-2');
-                    };
-                    animatedVideo.onerror = () => {
-                        console.error('Failed to load animation-2 video:', animation2Src);
-                    };
-                }, transitionDuration);
-            }
-            typeResponse(agentMessage, text);
         };
 
-        narrationAudio.play().catch(error => {
-            console.error('Narration audio playback failed:', error);
-        }).then(() => {
-            console.log('Narration audio play() called');
-            if (animatedVideo) {
-                const animation2Src = '/assets/animation-2.mp4';
-                console.log('Switching to animation-2 (fallback):', animation2Src);
-                animatedVideo.style.opacity = '0';
-                const transitionDuration = 500;
-                setTimeout(() => {
-                    animatedVideo.src = animation2Src;
-                    animatedVideo.load();
-                    animatedVideo.onloadeddata = () => {
-                        animatedVideo.play().catch(error => {
-                            console.error('Animation-2 video playback failed:', error);
-                        });
-                        animatedVideo.style.opacity = '1';
-                        currentVideoState = 'animation-2';
-                        console.log('Successfully switched to animation-2 (fallback)');
-                    };
-                    animatedVideo.onerror = () => {
-                        console.error('Failed to load animation-2 video:', animation2Src);
-                    };
-                }, transitionDuration);
-            }
-            typeResponse(agentMessage, text);
-        });
-
-        return new Promise((resolve) => {
-            narrationAudio.onended = () => {
-                console.log('Narration audio ended (onended event fired)');
-                if (!hasCleanedUp) {
-                    hasCleanedUp = true;
-                    cleanupAndSwitchBack(animatedVideo, effectAudio, audioContext, audioUrl, resolve, currentVideoState);
-                }
-            };
-
-            narrationAudio.onerror = (error) => {
-                console.error('Narration audio error:', error);
-                if (!hasCleanedUp) {
-                    hasCleanedUp = true;
-                    cleanupAndSwitchBack(animatedVideo, effectAudio, audioContext, audioUrl, resolve, currentVideoState);
-                }
-            };
-        });
+        return source;
     } catch (error) {
-        console.error('Error narrating response:', error);
-        if (narratingIndicator) narratingIndicator.remove();
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.8;
-            utterance.pitch = 0.7;
-            const voices = window.speechSynthesis.getVoices();
-            const fallbackVoice = voices.find(voice => voice.lang === 'en-US') || voices[0];
-            if (fallbackVoice) utterance.voice = fallbackVoice;
-            window.speechSynthesis.speak(utterance);
+        console.error('Narration Error:', error.message);
+        if (!hasCleanedUp) {
+            hasCleanedUp = true;
+            narratingIndicator.classList.add('hidden');
         }
         throw error;
     }
 }
 
-// Helper function to clean up and switch back to animation-1
-function cleanupAndSwitchBack(animatedVideo, effectAudio, audioContext, audioUrl, resolve, currentVideoState) {
-    try {
-        effectAudio.pause();
-    } catch (error) {
-        console.error('Failed to pause effect audio:', error);
-    }
-
-    if (audioContext.state !== 'closed') {
-        audioContext.close().catch(error => {
-            console.error('Failed to close AudioContext:', error);
-        });
-    }
-
-    URL.revokeObjectURL(audioUrl);
-
-    if (animatedVideo) {
-        console.log('Current video state:', currentVideoState);
-        if (currentVideoState === 'animation-2') {
-            const animation1Src = '/assets/animation-1.mp4';
-            console.log('Switching back to animation-1:', animation1Src);
-            animatedVideo.style.opacity = '0';
-            setTimeout(() => {
-                animatedVideo.src = animation1Src;
-                animatedVideo.load();
-                animatedVideo.onloadeddata = () => {
-                    animatedVideo.play().catch(error => {
-                        console.error('Animation-1 video playback failed:', error);
-                    });
-                    animatedVideo.style.opacity = '1';
-                    console.log('Successfully switched back to animation-1');
-                };
-                animatedVideo.onerror = () => {
-                    console.error('Failed to load animation-1 video:', animation1Src);
-                };
-            }, 500);
-        } else {
-            console.warn('Expected video state to be animation-2, but found:', currentVideoState);
-        }
-    } else {
-        console.error('Animated video element not available during cleanup');
-    }
-
-    resolve();
+// Toggle Chatbox Body
+function toggleChatboxBody() {
+    const chatbox = document.getElementById('chatbox');
+    chatbox.classList.toggle('minimized');
 }
 
-// Copy CA to Clipboard
-function copyCA() {
-    const caText = 'Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump';
-    navigator.clipboard.writeText(caText).then(() => {
-        alert('CA copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy CA: ', err);
-        alert('Failed to copy CA. Please copy it manually.');
-    });
+// Maximize Chatbox
+function maximizeChatbox() {
+    const chatbox = document.getElementById('chatbox');
+    chatbox.classList.remove('minimized');
 }
 
-// Socials and Roadmap Dropdown Logic
+// Toggle Navigation Menu (Mobile)
+function toggleMenu() {
+    const nav = document.getElementById('nav-menu');
+    nav.classList.toggle('open');
+}
+
+// Toggle Dropdown Menu
 function toggleDropdown(event) {
     event.preventDefault();
-    const target = event.currentTarget;
-    const dropdownId = target.nextElementSibling.id;
-    const dropdown = document.getElementById(dropdownId);
+    const dropdown = event.target.nextElementSibling;
     const isActive = dropdown.classList.contains('active');
 
     // Close all dropdowns
-    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+    document.querySelectorAll('.dropdown').forEach(d => {
+        d.classList.remove('active');
+    });
 
     // Toggle the clicked dropdown
     if (!isActive) {
@@ -392,69 +304,51 @@ function toggleDropdown(event) {
     }
 }
 
+// Close dropdowns when clicking outside
 document.addEventListener('click', function(event) {
     const dropdowns = document.querySelectorAll('.dropdown');
-    const tabs = document.querySelectorAll('.socials a, .roadmap a');
-    let isInsideDropdownOrTab = false;
+    const navLinks = document.querySelectorAll('nav ul li a');
 
+    let isDropdownClick = false;
     dropdowns.forEach(dropdown => {
-        if (dropdown.contains(event.target)) isInsideDropdownOrTab = true;
-    });
-    tabs.forEach(tab => {
-        if (tab.contains(event.target)) isInsideDropdownOrTab = true;
+        if (dropdown.contains(event.target)) {
+            isDropdownClick = true;
+        }
     });
 
-    if (!isInsideDropdownOrTab) {
-        dropdowns.forEach(dropdown => dropdown.classList.remove('active'));
+    let isNavLinkClick = false;
+    navLinks.forEach(link => {
+        if (link === event.target) {
+            isNavLinkClick = true;
+        }
+    });
+
+    if (!isDropdownClick && !isNavLinkClick) {
+        dropdowns.forEach(dropdown => {
+            dropdown.classList.remove('active');
+        });
     }
 });
 
-// Chatbox Logic (Toggle Body and Input)
-function toggleChatboxBody() {
-    const chatbox = document.getElementById('chatbox');
-    const chatboxBody = document.getElementById('chatbox-body');
-    const chatboxInput = document.querySelector('.chatbox-input');
-    const chatboxHeader = document.querySelector('.chatbox-header');
+// Copy CA to Clipboard
+function copyCA() {
+    const caAddressElements = document.querySelectorAll('.ca-address');
+    let caAddress = '';
+    
+    caAddressElements.forEach(element => {
+        if (element.textContent) {
+            caAddress = element.textContent.trim();
+        }
+    });
 
-    chatboxBody.style.display = chatboxBody.style.display === 'block' ? 'none' : 'block';
-    chatboxInput.style.display = chatboxInput.style.display === 'block' ? 'none' : 'block';
-    chatboxHeader.classList.toggle('open');
-
-    // Toggle minimized class based on visibility
-    if (chatboxBody.style.display === 'none') {
-        chatbox.classList.add('minimized');
+    if (caAddress) {
+        navigator.clipboard.writeText(caAddress).then(() => {
+            alert('Contract Address copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy CA:', err);
+            alert('Failed to copy Contract Address. Please copy it manually.');
+        });
     } else {
-        chatbox.classList.remove('minimized');
+        alert('Contract Address not found.');
     }
-}
-
-// Minimize Chatbox
-function minimizeChatbox(event) {
-    event.stopPropagation();
-    const chatboxBody = document.getElementById('chatbox-body');
-    const chatboxInput = document.querySelector('.chatbox-input');
-    const chatboxHeader = document.querySelector('.chatbox-header');
-
-    chatboxBody.style.display = 'none';
-    chatboxInput.style.display = 'none';
-    chatboxHeader.classList.remove('open');
-    document.getElementById('chatbox').classList.add('minimized');
-}
-
-// Maximize Chatbox
-function maximizeChatbox() {
-    const chatboxBody = document.getElementById('chatbox-body');
-    const chatboxInput = document.querySelector('.chatbox-input');
-    const chatboxHeader = document.querySelector('.chatbox-header');
-
-    chatboxBody.style.display = 'block';
-    chatboxInput.style.display = 'block';
-    chatboxHeader.classList.add('open');
-    document.getElementById('chatbox').classList.remove('minimized');
-}
-
-// Menu Logic
-function toggleMenu() {
-    const navMenu = document.getElementById('nav-menu');
-    navMenu.classList.toggle('open');
 }
