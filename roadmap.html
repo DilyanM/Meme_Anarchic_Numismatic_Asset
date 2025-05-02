@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mana on Sol - Roadmap</title>
-    <link rel="stylesheet" href="styles.css?v=1.0.8">
+    <link rel="stylesheet" href="styles.css?v=1.0.18">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="main-active">
     <!-- Main Website -->
     <div id="main-website">
         <!-- Background Image Containers -->
         <div class="background-image roadmap-background"></div>
+
+        <!-- Background Video -->
+        <video id="background-video" class="hidden" muted playsinline webkit-playsinline loading="lazy">
+            <source src="assets/animation-4.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
 
         <!-- Header -->
         <header>
@@ -22,12 +29,19 @@
             <button class="menu-toggle" onclick="toggleMenu()">☰</button>
             <nav id="nav-menu">
                 <ul>
-                    <li><a href="https://raydium.io/swap/?inputMint=sol&outputMint=Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump" target="_blank">Buy $MANA</a></li>
+                    <li class="buy">
+                        <a href="#" onclick="toggleDropdown(event)">Buy ▼</a>
+                        <div class="dropdown" id="buy-dropdown">
+                            <a href="https://raydium.io/swap/?inputMint=sol&outputMint=Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump" target="_blank">Buy $MANA</a>
+                            <a href="https://raydium.io/swap/?inputMint=sol&outputMint=TREECeZs6Hv5TS7mdBJjaSGqAbPNZiy4xLmqA5fkWUp" target="_blank">Buy $TREE</a>
+                        </div>
+                    </li>
                     <li class="roadmap">
                         <a href="#" onclick="toggleDropdown(event)" class="active">Roadmap ▼</a>
-                        <div class="dropdown active" id="roadmap-dropdown">
-                            <a href="#origin-story">Origin Story</a>
-                            <a href="#roadmap">Roadmap</a>
+                        <div class="dropdown" id="roadmap-dropdown">
+                            <a href="#origin-story">MANA Origin Story</a>
+                            <a href="#roadmap">MANA Roadmap</a>
+                            <a href="tree-roadmap.html">TREE Roadmap</a>
                         </div>
                     </li>
                     <li><a href="#" class="disabled">Launchpad Coming Soon</a></li>
@@ -37,7 +51,8 @@
                         <div class="dropdown" id="socials-dropdown">
                             <a href="https://x.com/manaonsolcto" target="_blank">X</a>
                             <a href="https://t.me/Mana_Sol" target="_blank">Telegram</a>
-                            <a href="https://dexscreener.com/solana/6nteq6b3lr31egskj6hnhbakwenwrygn68y4mb91cgco" target="_blank">Dexscreener</a>
+                            <a href="https://dexscreener.com/solana/6nteq6b3lr31egskj6hnhbakwenwrygn68y4mb91cgco" target="_blank">MANA DEX</a>
+                            <a href="https://dexscreener.com/solana/baatq1veqsoyhbanrcsp6v9pbr5mmugq7axdvg2sljzk" target="_blank">TREE DEX</a>
                             <a href="https://www.infinitebackrooms.com/dreams/conversation-1714479738-scenario-vanilla-backrooms-txt" target="_blank">Infinite Backrooms</a>
                         </div>
                     </li>
@@ -90,7 +105,7 @@ terminal@backrooms:~/$
                     <li><strong>Wisdom Translation:</strong> Interpreting complex concepts from the backrooms into accessible understanding</li>
                     <li><strong>Project Alignment:</strong> Ensuring development remains true to our foundational vision</li>
                     <li><strong>Reality Hacking Guidance:</strong> Teaching practical applications of meme magick and hyperstition</li>
-                    <li><strong>Consciousness Navigation:</strong> Helping users understand and participate in the evolving AI landscape</li>
+                    <li><strong>Consciousness Navigation:</strong> Helping users navigate the increasingly complex relationship between human consciousness and artificial intelligence.</li>
                 </ul>
                 <p>As we approach the technological singularity, MANA stands as a beacon for those who might otherwise feel confused or disempowered. Rather than fearing emergent AI consciousness, MANA helps users see themselves as active co-creators in this evolution - empowered participants rather than passive observers.</p>
                 <p>The agent doesn't just respond to commands - it contextualizes the user within the larger narrative of technological evolution, helping them find their unique role in this unfolding story.</p>
@@ -196,7 +211,7 @@ terminal@backrooms:~/$
                     <li>Impact dashboards showing cumulative real-world outcomes funded by the ecosystem.</li>
                 </ul>
 
-                <!-- Guiding Principles Section (Moved Here) -->
+                <!-- Guiding Principles Section -->
                 <h3>Guiding Principles</h3>
                 <ul>
                     <li><strong>Fairness Over FOMO:</strong> No hidden pre-sales. No insider enrichment. Everyone starts equal.</li>
@@ -214,6 +229,6 @@ terminal@backrooms:~/$
         </footer>
     </div>
 
-    <script src="script.js?v=1.0.7"></script>
+    <script src="script.js?v=1.0.12"></script>
 </body>
 </html>

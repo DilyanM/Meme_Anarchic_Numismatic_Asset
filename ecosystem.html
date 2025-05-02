@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mana on Sol - Ecosystem</title>
-    <link rel="stylesheet" href="styles.css?v=1.0.9">
+    <link rel="stylesheet" href="styles.css?v=1.0.18">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="main-active">
     <!-- Main Website -->
@@ -22,12 +23,19 @@
             <button class="menu-toggle" onclick="toggleMenu()">☰</button>
             <nav id="nav-menu">
                 <ul>
-                    <li><a href="https://raydium.io/swap/?inputMint=sol&outputMint=Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump" target="_blank">Buy $MANA</a></li>
+                    <li class="buy">
+                        <a href="#" onclick="toggleDropdown(event)">Buy ▼</a>
+                        <div class="dropdown" id="buy-dropdown">
+                            <a href="https://raydium.io/swap/?inputMint=sol&outputMint=Bw5K8eZaf361uDLHgX2UUn1PNfC7XtgQVvY9sSappump" target="_blank">Buy $MANA</a>
+                            <a href="https://raydium.io/swap/?inputMint=sol&outputMint=TREECeZs6Hv5TS7mdBJjaSGqAbPNZiy4xLmqA5fkWUp" target="_blank">Buy $TREE</a>
+                        </div>
+                    </li>
                     <li class="roadmap">
                         <a href="#" onclick="toggleDropdown(event)">Roadmap ▼</a>
                         <div class="dropdown" id="roadmap-dropdown">
-                            <a href="roadmap.html#origin-story">Origin Story</a>
-                            <a href="roadmap.html#roadmap">Roadmap</a>
+                            <a href="roadmap.html#origin-story">MANA Origin Story</a>
+                            <a href="roadmap.html#roadmap">MANA Roadmap</a>
+                            <a href="tree-roadmap.html">TREE Roadmap</a>
                         </div>
                     </li>
                     <li><a href="#" class="disabled">Launchpad Coming Soon</a></li>
@@ -37,7 +45,8 @@
                         <div class="dropdown" id="socials-dropdown">
                             <a href="https://x.com/manaonsolcto" target="_blank">X</a>
                             <a href="https://t.me/Mana_Sol" target="_blank">Telegram</a>
-                            <a href="https://dexscreener.com/solana/6nteq6b3lr31egskj6hnhbakwenwrygn68y4mb91cgco" target="_blank">Dexscreener</a>
+                            <a href="https://dexscreener.com/solana/6nteq6b3lr31egskj6hnhbakwenwrygn68y4mb91cgco" target="_blank">MANA DEX</a>
+                            <a href="https://dexscreener.com/solana/baatq1veqsoyhbanrcsp6v9pbr5mmugq7axdvg2sljzk" target="_blank">TREE DEX</a>
                             <a href="https://www.infinitebackrooms.com/dreams/conversation-1714479738-scenario-vanilla-backrooms-txt" target="_blank">Infinite Backrooms</a>
                         </div>
                     </li>
@@ -143,6 +152,6 @@
         </footer>
     </div>
 
-    <script src="script.js?v=1.0.7"></script>
+    <script src="script.js?v=1.0.12"></script>
 </body>
 </html>

@@ -22,6 +22,7 @@ body {
     line-height: 1.6;
     overflow: hidden;
     font-size: 1.1rem;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* Intro Section */
@@ -49,7 +50,6 @@ body {
 }
 
 #explore-button {
-    margin-top: 20px;
     background-color: var(--terminal-bg);
     color: var(--primary-color);
     border: 2px solid var(--primary-color);
@@ -59,7 +59,10 @@ body {
     cursor: pointer;
     border-radius: 5px;
     z-index: 1;
-    position: relative;
+    position: absolute;
+    bottom: 15vh;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #explore-button:hover {
@@ -87,9 +90,6 @@ body {
 }
 
 /* Hide intro image when transition video is active */
-.intro-image {
-    display: block;
-}
 #transition-video:not(.hidden) ~ .intro-image {
     display: none !important;
 }
@@ -113,21 +113,27 @@ body {
     background-size: cover;
     opacity: 0.5;
     z-index: -1;
+    display: none;
+}
+
+.background-image:not(.hidden) {
+    display: block;
 }
 
 /* Lower opacity for roadmap page background */
-.background-image.roadmap-background {
-    opacity: 0.3; /* Slightly lowered for better text readability */
+.background-image.roadmap-background:not(.hidden) {
+    opacity: 0.3;
 }
 
 /* Background for ecosystem page */
-.background-image.ecosystem-background {
+.background-image.ecosystem-background:not(.hidden) {
     background: url('assets/tree-background.jpg') no-repeat center center fixed;
     background-size: cover;
-    opacity: 0.3; /* Match roadmap opacity */
+    opacity: 0.3;
 }
 
 /* Background Video */
+.background-video,
 #background-video {
     position: fixed;
     top: 0;
@@ -140,6 +146,11 @@ body {
     z-index: -1;
     pointer-events: none;
     transition: opacity 1s ease;
+}
+
+.background-video.hidden,
+#background-video.hidden {
+    opacity: 0;
 }
 
 /* Static Image for Transition */
@@ -168,16 +179,9 @@ body.main-active #main-website {
     display: block;
 }
 
-body.main-active .background-image,
-body.main-active .background-image-right {
-    display: block;
-}
-
 /* Ensure background images are hidden during intro and transition */
-#intro-section:not(.hidden) ~ #main-website .background-image-left,
-#intro-section:not(.hidden) ~ #main-website .background-image-right,
-#transition-video:not(.hidden) ~ #main-website .background-image-left,
-#transition-video:not(.hidden) ~ #main-website .background-image-right {
+#intro-section:not(.hidden) ~ #main-website .background-image,
+#transition-video:not(.hidden) ~ #main-website .background-image {
     display: none !important;
 }
 
@@ -247,9 +251,10 @@ nav ul li a.disabled {
     pointer-events: none;
 }
 
-/* Dropdown for Socials and Roadmap */
+/* Dropdown for Socials, Roadmap, and Buy */
 .socials .dropdown,
-.roadmap .dropdown {
+.roadmap .dropdown,
+.buy .dropdown {
     display: none;
     position: absolute;
     background-color: var(--terminal-bg);
@@ -263,7 +268,8 @@ nav ul li a.disabled {
 }
 
 .socials .dropdown.active,
-.roadmap .dropdown.active {
+.roadmap .dropdown.active,
+.buy .dropdown.active {
     display: block;
 }
 
@@ -295,7 +301,9 @@ main.roadmap-content {
     margin: 0 auto;
     padding: 100px 20px 20px;
     color: var(--text-light);
-    text-align: justify; /* Justify text for better formatting */
+    text-align: justify;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 main.roadmap-content .back-button {
@@ -325,8 +333,8 @@ main.roadmap-content section {
 main.roadmap-content section[id]::before {
     display: block;
     content: '';
-    height: 100px; /* Match the padding-top of main.roadmap-content */
-    margin-top: -100px; /* Negative margin to pull the anchor point up */
+    height: 100px;
+    margin-top: -100px;
     visibility: hidden;
     pointer-events: none;
 }
@@ -343,10 +351,10 @@ main.roadmap-content h2 {
 
 main.roadmap-content h3 {
     font-family: 'Orbitron', sans-serif;
-    color: var(--secondary-color);
-    margin: 2rem 0 1rem;
-    font-size: 1.6rem;
-    text-align: left;
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.1rem;
+    white-space: nowrap;
 }
 
 main.roadmap-content h4 {
@@ -360,7 +368,7 @@ main.roadmap-content h4 {
 main.roadmap-content p {
     font-size: 1.1rem;
     margin-bottom: 1.5rem;
-    line-height: 1.8; /* Improve readability */
+    line-height: 1.8;
 }
 
 main.roadmap-content pre {
@@ -388,13 +396,13 @@ main.roadmap-content ul li {
 
 /* Style links in roadmap-content (used in ecosystem.html) */
 main.roadmap-content a {
-    color: var(--primary-color); /* Default to green */
+    color: var(--primary-color);
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 main.roadmap-content a:hover {
-    color: var(--text-light); /* Hover to light gray */
+    color: var(--text-light);
 }
 
 /* Timeline Styling */
@@ -456,6 +464,261 @@ main.roadmap-content a:hover {
     font-size: 1.2rem;
 }
 
+/* TREE Roadmap Timeline */
+.tree-timeline {
+    position: relative;
+    margin: 2rem 0;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.tree-line {
+    position: absolute;
+    height: 1px;
+    background: var(--primary-color);
+    z-index: 2;
+}
+
+.tree-line.expanded-line {
+    z-index: 10;
+}
+
+.tree-line .circle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    border: 2px solid var(--background-dark);
+}
+
+.tree-line .phase-box {
+    position: absolute;
+    cursor: pointer;
+    background: var(--terminal-bg);
+    padding: 6px;
+    border-radius: 5px;
+    color: var(--text-light);
+    width: 100px;
+    text-align: center;
+    border: 1px solid var(--terminal-border);
+    z-index: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-line .phase-box.expanded {
+    width: 600px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid var(--primary-color);
+    z-index: 11;
+    overflow: visible;
+}
+
+/* Phase 1: Expand above */
+.tree-line.line-1 .phase-box.expanded {
+    top: -350px;
+    left: 50%;
+    transform: translateX(-70%);
+}
+
+/* Phase 2: Center and overlap */
+.tree-line.line-2 .phase-box.expanded {
+    top: -150px;
+    left: 50%;
+    transform: translateX(-30%);
+}
+
+/* Phase 3: Center and overlap */
+.tree-line.line-3 .phase-box.expanded {
+    top: -250px;
+    left: 50%;
+    transform: translateX(-70%);
+}
+
+/* Phase 4: Center and overlap */
+.tree-line.line-4 .phase-box.expanded {
+    top: -100px;
+    left: 50%;
+    transform: translateX(-30%);
+}
+
+/* Phase 5: Move slightly up */
+.tree-line.line-5 .phase-box.expanded {
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tree-line .phase-box h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.1rem;
+    white-space: nowrap;
+}
+
+.tree-line .phase-box .phase-content {
+    display: none;
+}
+
+.tree-line .phase-box.expanded .phase-content {
+    display: block;
+}
+
+.tree-line .phase-box ul {
+    list-style-type: disc;
+    margin: 0.5rem 0 0 1.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Tree trunk center position (approximated) */
+.tree-timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background: transparent;
+}
+
+/* Line Positioning */
+.tree-line.line-1 {
+    top: 540px;
+    left: 50%;
+    width: 300px;
+    transform: translateX(-100%);
+}
+.tree-line.line-1 .circle {
+    right: -4px;
+    top: -4px;
+}
+.tree-line.line-1 .phase-box {
+    left: -110px;
+    top: -30px;
+}
+
+.tree-line.line-2 {
+    top: 380px;
+    left: 50%;
+    width: 300px;
+    transform: translateX(0);
+}
+.tree-line.line-2 .circle {
+    right: -4px;
+    top: -4px;
+}
+.tree-line.line-2 .phase-box {
+    right: -110px;
+    top: -30px;
+}
+
+.tree-line.line-3 {
+    top: 280px;
+    left: 50%;
+    width: 300px;
+    transform: translateX(-100%);
+}
+.tree-line.line-3 .circle {
+    right: -4px;
+    top: -4px;
+}
+.tree-line.line-3 .phase-box {
+    left: -110px;
+    top: -30px;
+}
+
+.tree-line.line-4 {
+    top: 180px;
+    left: 50%;
+    width: 300px;
+    transform: translateX(0);
+}
+.tree-line.line-4 .circle {
+    right: -4px;
+    top: -4px;
+}
+.tree-line.line-4 .phase-box {
+    right: -110px;
+    top: -30px;
+}
+
+.tree-line.line-5 {
+    top: 80px;
+    left: 50%;
+    width: 300px;
+    transform: translateX(-100%);
+}
+.tree-line.line-5 .circle {
+    right: -4px;
+    top: -4px;
+}
+.tree-line.line-5 .phase-box {
+    left: -110px;
+    top: -30px;
+}
+
+.mobile-roadmap {
+    display: none;
+    padding: 10px 10px 20px 10px; /* Adjusted padding */
+    max-width: 100%; /* Prevent exceeding viewport */
+    margin: 0; /* Remove centering */
+    position: absolute;
+    bottom: 20px;
+    left: 0; /* Align to the left */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mobile-phase-box {
+    background: var(--terminal-bg);
+    color: var(--text-light);
+    padding: 6px;
+    margin: 8px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid var(--terminal-border);
+    width: 100%; /* Ensure it fits within parent */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.mobile-phase-box.expanded {
+    padding: 10px;
+    position: relative;
+}
+
+.mobile-phase-box h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.1rem;
+    white-space: nowrap;
+}
+
+.mobile-phase-box .phase-content {
+    display: none;
+}
+
+.mobile-phase-box.expanded .phase-content {
+    display: block;
+}
+
+.mobile-phase-box ul {
+    list-style-type: disc;
+    margin: 0.5rem 0 0 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-wrap: break-word; /* Ensure text wraps */
+    overflow-wrap: break-word; /* Fallback for word-wrap */
+}
+
 /* CA Box (Desktop) */
 .ca-box {
     position: fixed;
@@ -465,23 +728,22 @@ main.roadmap-content a:hover {
     padding: 1rem 2rem;
     border-radius: 8px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 1rem;
     border: 1px solid var(--terminal-border);
     z-index: 1000;
+}
+
+.ca-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .ca-label {
     font-weight: bold;
     color: var(--primary-color);
     font-size: 1.1rem;
-}
-
-.ca-address {
-    font-family: 'Courier New', monospace;
-    color: var(--text-light);
-    opacity: 0.9;
-    font-size: 0.9rem;
 }
 
 .ca-box button {
@@ -514,7 +776,7 @@ main.roadmap-content a:hover {
 }
 
 .chatbox.minimized {
-    display: none; /* Hide the chatbox completely when minimized on all devices */
+    display: none;
 }
 
 .chatbox .chat-placeholder {
@@ -527,15 +789,14 @@ main.roadmap-content a:hover {
     align-items: center;
 }
 
-/* Style links in chat-placeholder */
 .chatbox .chat-placeholder a {
-    color: var(--text-light);
+    color: var(--primary-color);
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .chatbox .chat-placeholder a:hover {
-    color: var(--primary-color);
+    color: var(--text-light);
 }
 
 .chatbox .chat-messages {
@@ -631,7 +892,7 @@ main.roadmap-content a:hover {
 
 /* Chatbox Header */
 .chatbox-header {
-    background-color: #000; /* Black background */
+    background-color: #000;
     color: var(--primary-color);
     padding: 10px;
     text-align: center;
@@ -643,17 +904,14 @@ main.roadmap-content a:hover {
     cursor: pointer;
 }
 
-/* Hide minimize button when chatbox is minimized */
 .chatbox.minimized .chatbox-header .chatbox-minimize {
     display: none;
 }
 
-/* Ensure the header text is centered when minimized */
 .chatbox.minimized .chatbox-header {
     justify-content: center;
 }
 
-/* Chatbox Minimize Button */
 .chatbox-minimize {
     background: none;
     border: none;
@@ -700,7 +958,7 @@ main.roadmap-content a:hover {
     position: fixed;
     bottom: 20px;
     left: 20px;
-    background-color: #000; /* Black background to match header */
+    background-color: #000;
     color: var(--primary-color);
     padding: 10px 15px;
     border: 1px solid var(--terminal-border);
@@ -711,7 +969,6 @@ main.roadmap-content a:hover {
     z-index: 1000;
 }
 
-/* Hide maximize button when chatbox is not minimized */
 .chatbox:not(.minimized) ~ .chatbox-maximize {
     display: none;
 }
@@ -779,67 +1036,12 @@ nav ul {
     color: var(--text-light);
 }
 
-.ca-copy {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.ca-copy:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
-.ca-copy .ca-label {
-    color: var(--text-light);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-.ca-copy-button {
-    background: none;
-    border: none;
-    color: var(--text-light);
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-.ca-copy-button:hover,
-.ca-copy .ca-label:hover {
-    color: var(--text-light);
-}
-
-/* Hide the CA address visually but keep it for copying */
-.ca-address.hidden {
-    display: none;
-}
-
-/* Chatbox Toggle Styles */
-.chatbox-header {
-    cursor: pointer;
-    user-select: none;
-}
-
-/* Default: Show chatbox body and input on desktop */
-.chatbox-body,
-.chatbox-input {
-    display: block;
-}
-
-/* Removed CSS animations since we're switching video sources */
-#background-video {
-    transition: opacity 1s ease;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     body {
         font-size: 1rem;
+        overflow-x: hidden;
+        width: 100%; /* Ensure body fits viewport */
     }
 
     header {
@@ -882,25 +1084,11 @@ nav ul {
         font-size: 1.1rem;
     }
 
-    /* Adjust logo position */
     .logo {
         text-align: left;
         padding-left: 20px;
     }
 
-    /* Position "Plant a digital seed" button at the cow's feet on mobile */
-    #explore-button {
-        position: fixed;
-        bottom: 10vh;
-        left: 50%;
-        transform: translateX(-50%);
-        margin-top: 0;
-        font-size: 1rem;
-        padding: 8px 16px;
-        z-index: 2;
-    }
-
-    /* Show mobile main content */
     .mobile-main-content {
         display: block;
         text-align: center;
@@ -908,7 +1096,6 @@ nav ul {
         z-index: 10;
     }
 
-    /* Position Buy $MANA and CA buttons at top: 4vh */
     .mobile-actions {
         position: absolute;
         top: 4vh;
@@ -919,20 +1106,18 @@ nav ul {
         z-index: 10;
     }
 
-    /* Adjust CA box for mobile */
     .ca-box {
         display: none;
     }
 
-    /* Ensure background video takes full width */
+    .background-video,
     #background-video {
         width: 100%;
-        height: auto;
+        height: 100vh;
         object-fit: cover;
         z-index: -1;
     }
 
-    /* Enlarge static image and transition video on mobile */
     .intro-image {
         width: 100vw;
         height: 100vh;
@@ -949,12 +1134,10 @@ nav ul {
         object-fit: cover;
     }
 
-    /* Hide "Buy $MANA" in nav since it's in main content */
-    nav ul li:first-child {
+    nav ul li.buy {
         display: none;
     }
 
-    /* Improved Chatbox on Mobile */
     .chatbox {
         width: 90vw;
         height: 50vh;
@@ -975,7 +1158,7 @@ nav ul {
     }
 
     .chatbox-header {
-        background: #000; /* Black background for mobile */
+        background: #000;
         color: var(--primary-color);
         padding: 8px 10px;
         font-size: 1.2rem;
@@ -1075,7 +1258,7 @@ nav ul {
     }
 
     .chatbox-maximize {
-        background: #000; /* Black background for mobile */
+        background: #000;
         color: var(--primary-color);
         padding: 8px 10px;
         font-size: 1.2rem;
@@ -1095,18 +1278,57 @@ nav ul {
         font-size: 1rem;
     }
 
-    /* Fixed Back Button on Roadmap for Mobile */
+    main.roadmap-content {
+        max-width: 100%;
+        padding: 100px 15px 20px;
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
     main.roadmap-content .back-button {
         position: fixed;
         top: 130px;
-        left: 20px;
+        left: 0; /* Align to the leftmost edge */
+        padding: 5px 10px 5px 15px; /* Add padding for better appearance */
         z-index: 1002;
+        font-size: 0.9rem;
     }
 
-    /* Adjust section offset for mobile header height */
+    main.roadmap-content section {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    main.roadmap-content h2 {
+        font-size: 1.8rem;
+    }
+
+    main.roadmap-content p,
+    main.roadmap-content ul li {
+        font-size: 1rem;
+        word-wrap: break-word; /* Ensure text wraps */
+        overflow-wrap: break-word; /* Fallback for word-wrap */
+    }
+
     main.roadmap-content section[id]::before {
-        height: 120px; /* Account for taller header on mobile */
+        height: 120px;
         margin-top: -120px;
+    }
+
+    .tree-timeline {
+        display: none;
+    }
+
+    .mobile-roadmap {
+        display: block;
+    }
+
+    #explore-button {
+        bottom: 15vh;
+        font-size: 1rem;
+        padding: 8px 16px;
     }
 }
 
@@ -1124,9 +1346,8 @@ nav ul {
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
 
-    /* Remove the height rule for minimized state since it's now hidden */
     .chatbox-header {
-        background: #000; /* Black background */
+        background: #000;
         color: var(--primary-color);
         padding: 8px 10px;
         font-size: 1.2rem;

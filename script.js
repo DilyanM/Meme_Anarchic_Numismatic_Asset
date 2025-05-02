@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const introSection = document.getElementById('intro-section');
     const mainWebsite = document.getElementById('main-website');
     const transitionVideo = document.getElementById('transition-video');
-    const backgroundVideo = document.getElementById('background-video');
+    const backgroundVideo = document.getElementById('background-video-1') || document.getElementById('background-video');
 
     // Check for skipIntro query parameter
     const urlParams = new URLSearchParams(window.location.search);
@@ -63,43 +63,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add Enter key listener for chatbox input (disabled, but keeping for future use)
-    const userInput = document.getElementById('user-input');
-    if (userInput) {
-        userInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                sendMessage();
-            }
-        });
-    }
-
-    // Handle Roadmap dropdown click to play animation-3.mp4 once, then redirect
-    const roadmapLinks = document.querySelectorAll('#roadmap-dropdown a');
-    roadmapLinks.forEach(link => {
+    // Handle navigation links
+    const navLinks = document.querySelectorAll('nav ul li a:not([target="_blank"]), .dropdown a:not([target="_blank"])');
+    navLinks.forEach(link => {
         link.addEventListener('click', function(event) {
             event.preventDefault();
             const href = link.getAttribute('href');
+            if (href === '#' || !href) return; // Skip disabled links
 
-            if (backgroundVideo) {
+            // Close all dropdowns and the mobile menu
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+            const navMenu = document.getElementById('nav-menu');
+            if (navMenu.classList.contains('open')) {
+                navMenu.classList.remove('open');
+            }
+
+            // Hide background image during transition
+            const backgroundImages = document.querySelectorAll('.background-image');
+            backgroundImages.forEach(img => img.classList.add('hidden'));
+
+            // Skip animation-3 for specific routes
+            if (
+                window.location.pathname.includes('tree-roadmap.html') ||
+                (window.location.pathname.includes('roadmap.html') && (href === 'ecosystem.html' || href === 'tree-roadmap.html'))
+            ) {
+                window.location.href = href;
+                return;
+            }
+
+            // Play animation-3 for other pages
+            const videoElement = document.getElementById('background-video-1') || document.getElementById('background-video');
+            if (videoElement) {
                 const animation3Src = '/assets/animation-3.mp4';
-                backgroundVideo.removeAttribute('loop');
-                backgroundVideo.style.opacity = '0';
+                videoElement.removeAttribute('loop');
+                videoElement.style.opacity = '0';
                 setTimeout(() => {
-                    backgroundVideo.src = animation3Src;
-                    backgroundVideo.load();
-                    backgroundVideo.onloadeddata = () => {
-                        backgroundVideo.play().catch(error => {
+                    videoElement.src = animation3Src;
+                    videoElement.load();
+                    videoElement.onloadeddata = () => {
+                        videoElement.play().catch(error => {
                             console.error('Animation-3 video playback failed:', error);
                             window.location.href = href;
                         });
-                        backgroundVideo.style.opacity = '1';
+                        videoElement.style.opacity = '1';
                     };
-                    backgroundVideo.onerror = () => {
+                    videoElement.onerror = () => {
                         console.error('Failed to load animation-3 video:', animation3Src);
                         window.location.href = href;
                     };
-                    backgroundVideo.onended = () => {
+                    videoElement.onended = () => {
                         window.location.href = href;
                     };
                 }, 500);
@@ -109,49 +124,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle Ecosystem tab click to play animation-3.mp4 once, then redirect
-    const ecosystemLink = document.querySelector('nav ul li a[href="ecosystem.html"]');
-    if (ecosystemLink) {
-        ecosystemLink.addEventListener('click', function(event) {
-            event.preventDefault();
-            const href = ecosystemLink.getAttribute('href');
+    // Close dropdowns and mobile menu on click anywhere
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        const dropdownTriggers = document.querySelectorAll('.buy a, .roadmap a, .socials a');
+        const navMenu = document.getElementById('nav-menu');
+        const menuToggle = document.querySelector('.menu-toggle');
+        let isTriggerOrDropdown = false;
 
-            if (backgroundVideo) {
-                const animation3Src = '/assets/animation-3.mp4';
-                backgroundVideo.removeAttribute('loop');
-                backgroundVideo.style.opacity = '0';
-                setTimeout(() => {
-                    backgroundVideo.src = animation3Src;
-                    backgroundVideo.load();
-                    backgroundVideo.onloadeddata = () => {
-                        backgroundVideo.play().catch(error => {
-                            console.error('Animation-3 video playback failed:', error);
-                            window.location.href = href;
-                        });
-                        backgroundVideo.style.opacity = '1';
-                    };
-                    backgroundVideo.onerror = () => {
-                        console.error('Failed to load animation-3 video:', animation3Src);
-                        window.location.href = href;
-                    };
-                    backgroundVideo.onended = () => {
-                        window.location.href = href;
-                    };
-                }, 500);
-            } else {
-                window.location.href = href;
+        // Check if click is on a dropdown trigger or inside a dropdown
+        dropdownTriggers.forEach(trigger => {
+            if (trigger.contains(event.target)) {
+                isTriggerOrDropdown = true;
             }
         });
-    }
+        dropdowns.forEach(dropdown => {
+            if (dropdown.contains(event.target)) {
+                isTriggerOrDropdown = true;
+            }
+        });
+
+        // Close all dropdowns if click is outside
+        if (!isTriggerOrDropdown) {
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+        }
+
+        // Close mobile menu if click is outside the menu and menu toggle
+        if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+            navMenu.classList.remove('open');
+        }
+    });
 });
 
 // Chatbox Logic
 async function sendMessage() {
-    // Disabled functionality - input and button are disabled in HTML
     console.log('Message sending is disabled.');
 }
 
-// Fetch LLM Response via Netlify Function (kept for future use)
 async function fetchLLMResponse(message) {
     try {
         const response = await fetch('/.netlify/functions/llm-proxy', {
@@ -175,7 +186,6 @@ async function fetchLLMResponse(message) {
     }
 }
 
-// Typing animation (kept for future use)
 async function typeResponse(element, text) {
     element.textContent = '';
     const words = text.split(' ');
@@ -188,7 +198,6 @@ async function typeResponse(element, text) {
     }
 }
 
-// Voice narration with ethereal effects (via Netlify Function, kept for future use)
 async function narrateResponse(text, narratingIndicator, agentMessage) {
     let hasCleanedUp = false;
 
@@ -269,80 +278,45 @@ async function narrateResponse(text, narratingIndicator, agentMessage) {
     }
 }
 
-// Toggle Chatbox Body
 function toggleChatboxBody() {
     const chatbox = document.getElementById('chatbox');
     chatbox.classList.toggle('minimized');
 }
 
-// Maximize Chatbox
 function maximizeChatbox() {
     const chatbox = document.getElementById('chatbox');
     chatbox.classList.remove('minimized');
 }
 
-// Toggle Navigation Menu (Mobile)
 function toggleMenu() {
     const nav = document.getElementById('nav-menu');
     nav.classList.toggle('open');
+
+    // Close all dropdowns when toggling the menu
+    const dropdowns = document.querySelectorAll('.dropdown');
+    dropdowns.forEach(dropdown => {
+        dropdown.classList.remove('active');
+    });
 }
 
-// Toggle Dropdown Menu
 function toggleDropdown(event) {
     event.preventDefault();
+    event.stopPropagation();
     const dropdown = event.target.nextElementSibling;
     const isActive = dropdown.classList.contains('active');
 
-    // Close all dropdowns
     document.querySelectorAll('.dropdown').forEach(d => {
         d.classList.remove('active');
     });
 
-    // Toggle the clicked dropdown
     if (!isActive) {
         dropdown.classList.add('active');
     }
 }
 
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(event) {
-    const dropdowns = document.querySelectorAll('.dropdown');
-    const navLinks = document.querySelectorAll('nav ul li a');
-
-    let isDropdownClick = false;
-    dropdowns.forEach(dropdown => {
-        if (dropdown.contains(event.target)) {
-            isDropdownClick = true;
-        }
-    });
-
-    let isNavLinkClick = false;
-    navLinks.forEach(link => {
-        if (link === event.target) {
-            isNavLinkClick = true;
-        }
-    });
-
-    if (!isDropdownClick && !isNavLinkClick) {
-        dropdowns.forEach(dropdown => {
-            dropdown.classList.remove('active');
-        });
-    }
-});
-
-// Copy CA to Clipboard
-function copyCA() {
-    const caAddressElements = document.querySelectorAll('.ca-address');
-    let caAddress = '';
-    
-    caAddressElements.forEach(element => {
-        if (element.textContent) {
-            caAddress = element.textContent.trim();
-        }
-    });
-
-    if (caAddress) {
-        navigator.clipboard.writeText(caAddress).then(() => {
+function copyCA(address) {
+    if (address) {
+        navigator.clipboard.writeText(address).then(() => {
             alert('Contract Address copied to clipboard!');
         }).catch(err => {
             console.error('Failed to copy CA:', err);
